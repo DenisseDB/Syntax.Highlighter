@@ -1,23 +1,28 @@
+body {
+  background-color: black;
+  align-items: center;
+}
+
 .variable {
-  color: purple;
+  color: #800080;
 }
 
 .operadores {
-  color: palegreen;
+  color: #98fb98;
 }
 
 .numero {
-  color: plum;
+  color: #dda0dd;
 }
 
 .especiales {
-  color: peru;
+  color: #cd853f;
 }
 
 .comentarios {
-  color: powderblue;
+  color: #b0e0e6;
 }
 
 .reservadas {
-  color: palevioletred;
+  color: #d87093;
 }
