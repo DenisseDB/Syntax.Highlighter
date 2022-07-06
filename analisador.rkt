@@ -43,4 +43,4 @@
     [(regexp-match? operadores el) (string-append "<span class=\"operadores\">" el "</span>")]
     [(regexp-match? especiales el) (string-append "<span class=\"especiales\">" el "</span>")]
     [(regexp-match? comentarios el) (string-append "<span class=\"comentarios\">" el "</span>")]
-    [(regexp-match? reservadas el) (string-append "<span class=\"reservadas\">" el "</span>")]
+    [(regexp-match? reservadas el) (string-append "<span class=\"reservadas\">" el "</span>")]))
