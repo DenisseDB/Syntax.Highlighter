@@ -1,0 +1,23 @@
+.variable {
+  color: purple;
+}
+
+.operadores {
+  color: palegreen;
+}
+
+.reales {
+  color: plum;
+}
+
+.especiales {
+  color: peru;
+}
+
+.comentarios {
+  color: powderblue;
+}
+
+.reservadas {
+  color: palevioletred;
+}
