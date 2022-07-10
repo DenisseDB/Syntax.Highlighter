@@ -1,17 +1,24 @@
-//Codificado por: sAfOrAs
-//Código Fuente: Calcula cuantos números pares hay entre dos ingresados
+// TEST
+//Suma Z+ Con Recursividad code por: sAfOrAs
 #include<iostream>
 using namespace std;
-int main()
+int leedato()
 {
-    int a=0,b=0,c=0;
-    cout<<"ingrese un numero: ";cin>>a;
-    cout<<"ingrese otro numero: ";cin>>b;
-    while(a<=b)
-    {
-        if(a%2!=0)
-        c=c+1; a=a+1;       
-    }
-    cout<<c<<endl;
-    cin.ignore(); return 0;
+int i;
+cin>>i;
+return i;
+ 
 }
+ 
+int suma(int a, int b)
+{
+     
+    if(a>0 && b>0)
+        return 2+suma(a-1,b-1);
+    else
+    if(a>0 || b>0)
+        return 1+suma(a-1,b-1);
+    else
+        return 0;
+}
+ 
