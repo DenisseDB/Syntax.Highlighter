@@ -1,74 +1,66 @@
 #lang racket
+; Denisse Dominguez Bolaños
+; A01702603
+; Resaltador de sintaxis
+
 (require 2htdp/batch-io)
 
-; Denisse Dominguez Bolaños A01702603
-; RESALTADOR SINTAXICO
+; HTML Y CSS
+(define html "<!DOCTYPE html><html lang='esp-mx'> <head> <meta charset='UTF-8'>
+<link rel=\"stylesheet\" href=\"./styles_AS.css\">
+<title>Resaltador de Sintaxis</title></head><body></body></html>")
 
-; html
-(define html "<!DOCTYPE html>
-<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-<link rel=\"stylesheet\" href=\"./styles.css\">
-<title>Resaltador de Sintaxis</title>
-</head>
-<body>
-<h3 class=\"variable\"/h3>
-<h3 class=\"operadores\" /h3>
-<h3 class=\"numero\"/h3>
-<h3 class=\"especiales\"/h3>
-<h3 class=\"comentarios\"/h3>
-<h3 class=\"reservadas\"/h3>
-</body")
+; Para lexer, necesitamos establecer todos los tokens, para hacer las comparacines en cadena de longitud
+(define tokens #rx"main|iostream|#include|using|namespace|std|cout|cin|else|long|switch|break|typedef|return|char|float|const|for|sizeof|if|while|do|int|double|\\/\\/.*|\".*\"|^\\-*[0-9]+| ^[a-zA-Z]+|\\^|\\/|\\&|\\|\\+|\\-|\\*|\\=|\\(|\\)|\\=>|\\<=|.")
 
-; definimos los tokens 
-(define numero #rx"-*[0-9]+\\.[0-9]+([E][-*][0-9]+)?|-*[0-9]+(\\.[0-9]+)?")
-(define variable #rx"[a-zA-Z][a-zA-Z_0-9]*")
-(define operadores #rx"[\\*|\\/|\\^|\\=|\\+|\\-]")
-(define especiales #rx"[\\)\\(\\#\\;\\.\\}\\{\\<\\>]")
-(define comentarios #rx"[\\(\\)]")
-(define reservadas #rx"\\auto|\\else|\\long|\\switch|\\break|\\typedef|\\return|\\char|\\float|\\const|\\for|\\sizeof|\\if|\\while|\\do|\\int|\\double")
+; Establecemos a que pertenece cada expresion
+(define reservadas #rx"main|iostream|#include|using|namespace|std|cout|cin|else|long|switch|break|typedef|return|char|float|const|for|sizeof|if|while|do|int|double")
+(define comentarios #rx"\\/\\/.*")
+(define numero #rx"^\\-*[0-9]+")
+(define variable #px"^[a-zA-Z]+")
+(define operadores #rx"\\^|\\/|\\&|\\|\\+|\\-|\\*|\\=|\\(|\\)|\\=>|\\<=")
 
-
-; usamos regex que nos ayuda a determinar la secuencia
-; usamos match para construir el regx en base a un patron de expresiones regulares especificados ;string
-
+; Vamos detectando los token y emparejando acorde a su pertenencia y haciendo el
+; highlight acorde a su clase establecida en css
 (define (looking el)
+    (cond
+      ; especiales
+      [(regexp-match? #px"#[[:blank:]]*include" el) (string-append "<span class=\"include\">" el "</span>")]
+      [(regexp-match? #px"using" el) (string-append "<span class=\"include\">" el "</span>")]
+      [(regexp-match? #px"namespace" el) (string-append "<span class=\"include\">" el "</span>")]
+      [(regexp-match? #px"std" el) (string-append "<span class=\"iostream\">" el "</span>")]
+      [(regexp-match? #px"iostream" el) (string-append "<span class=\"iostream\">" el "</span>")]
+      ; reservadas
+      [(regexp-match? reservadas el) (string-append "<span class=\"reservada\">" el "</span>")]
+      ; comentarios
+      [(regexp-match? comentarios el) (string-append "<span class=\"comentario\">" el "</span>")]
+      ; numeros
+      [(regexp-match? numero el) (string-append "<span class=\"numero\">" el "</span>")]
+      ; variables
+      [(regexp-match? variable el) (string-append "<span class=\"variable\">" el "</span>")]
+      ; operadores
+      [(regexp-match? operadores el) (string-append "<span class=\"operador\">" el "</span>")]
+      ; resto
+      [else (string-append "<span>" el "</span>")]))
+
+; Juntamos todas las strings obtenidas 
+(define (join lst)
   (cond
-    [(regexp-match? numero el) (string-append "<span class=\"numero\">" el "</span>")]
-    [(regexp-match? variable el) (string-append "<span class=\"variable\">" el "</span>")]
-    [(regexp-match? operadores el) (string-append "<span class=\"operadores\">" el "</span>")]
-    [(regexp-match? especiales el) (string-append "<span class=\"especiales\">" el "</span>")]
-    [(regexp-match? comentarios el) (string-append "<span class=\"comentarios\">" el "</span>")]
-    [(regexp-match? reservadas el) (string-append "<span class=\"reservadas\">" el "</span>")]
-    [else((string-append "<span>" el "</span>"))]))
+    [(empty? lst) " "] ; agregamos los espacios para que se separen las lineas y poder hacer el match, ya que si estan juntas, se detectan incorrectamente
+    [else (string-append (looking (first lst)) (join (rest lst)))])) ; aplicamos recursion 
 
+; Concatenamos todo en una lista final
+(define (finalList lst)
+  (cond
+    [(empty? lst) " "] ; aplicamos espacio para dar claridad al codigo
+    [else (string-append (join (regexp-match* tokens (first lst))) (finalList (rest lst)))])) ; aplicamos recursion
 
-;; Leemos un archivo de entrada, lee caracter por caracter y regresa una lista
-(define file->list-of-chars
-  (lambda (filename)
-    (flatten
-     (map string->list
-          (read-1strings filename)))))
-
-(define file->list-of-strings
-  (lambda (input-filename)
-    ;(reverse que es esto???
-     (list-of-chars->list-of-strings
-      (file->list-of-chars input-filename) '() '()))))
-
-; Recivimos una strings y la vamos concatenando con el resto
-(define list-of-strings->string
-  (lambda (input-filename)
-    (string-append
-     (list-of-strings->string(looking (first lst)))
-     (list-of-strings->string(looking(rest lst))))))
-                           
-; Recivimos una lista de strings y las pone en el output file 
-(define listStringToFile
-  (lambda (input-filename output-filename)
-    (write-file output-filename (list-of-strings->string input-filename))))
-
-; input file
+; Declaramos nuestro input file
 (define input-filename "test.cpp")
 
-; output file
+; Declaramos nuestro output file
 (define output-filename "output.html")
+
+; Escribimos el archivo html de salida
+; escribimos archivo "output_FI.html" donde se juntan las strings del formato html con las del archivo "test.cpp" que es el input
+(write-file output-filename (string-append html (finalList (read-lines input-filename))))
