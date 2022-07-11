@@ -65,7 +65,7 @@
 
 ; Escribimos el archivo html de salida
 ; escribimos archivo "output_FI.html" donde se juntan las strings del formato html con las del archivo "test.cpp" que es el input
-(write-file output-filename (string-append html (finalList (read-lines input-filename))))
+(write-file output-filename (string-append html (firstJoin (read-lines input-filename))))
 
 ; funcion time que nos permite conocer el tiempo de ejecuccion
 ; lo hacemos con el write-file ya que aqui es donde ocurre todo la operacion
