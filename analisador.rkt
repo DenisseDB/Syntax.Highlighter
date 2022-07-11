@@ -43,17 +43,19 @@
       ; resto
       [else (string-append "<span>" el "</span>")]))
 
-; Juntamos todas las strings obtenidas 
+; De una lista incial que obtenemos del input, recorremos toda buscando un match con cada una de ellas acorde a la
+; lista de tokens estabelcidas al inciio
+(define (firstJoin lst)
+  (cond
+    [(empty? lst) " "] ; aplicamos espacio para dar claridad al codigo
+    [else (string-append (join (regexp-match* tokens (first lst))) (firstJoin (rest lst)))])) ; aplicamos recursion
+
+
+; Ahora vamos una por una, remarcandolas acorde a la expresion a la que pertenecen
 (define (join lst)
   (cond
     [(empty? lst) " "] ; agregamos los espacios para que se separen las lineas y poder hacer el match, ya que si estan juntas, se detectan incorrectamente
     [else (string-append (looking (first lst)) (join (rest lst)))])) ; aplicamos recursion 
-
-; Concatenamos todo en una lista final
-(define (finalList lst)
-  (cond
-    [(empty? lst) " "] ; aplicamos espacio para dar claridad al codigo
-    [else (string-append (join (regexp-match* tokens (first lst))) (finalList (rest lst)))])) ; aplicamos recursion
 
 ; Declaramos nuestro input file
 (define input-filename "test.cpp")
